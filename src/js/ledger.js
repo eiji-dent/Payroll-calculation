@@ -28,6 +28,10 @@ const ledgerRows = [
   { category: "控除", key: "housingRent", label: "社宅家賃", type: "number" },
   { category: "控除", key: "_totalDeductions", label: "控除合計", type: "calc", className: "font-bold bg-slate-50" },
   { category: "差引", key: "_netPay", label: "差引支給合計", type: "calc", className: "font-bold bg-teal-50 text-teal-900" },
+  { category: "設定情報", key: "_dependents", label: "扶養人数", type: "setting" },
+  { category: "設定情報", key: "_taxCategory", label: "税額表", type: "setting" },
+  { category: "設定情報", key: "_employeeType", label: "従業員区分", type: "setting" },
+  { category: "設定情報", key: "_standardRemuneration", label: "標準報酬月額", type: "setting" }
 ];
 
 export async function renderLedger(employeeId) {
@@ -124,6 +128,22 @@ export async function renderLedger(employeeId) {
         if (row.key === "_netPay") val = calc.netPay;
         rowTotal += val;
         html += `<td class="number-cell ${row.className || ''}">${val.toLocaleString()}</td>`;
+      } else if (row.type === "setting") {
+        let defaultVal = "";
+        if (row.key === "_dependents") defaultVal = emp.dependents || 0;
+        if (row.key === "_taxCategory") defaultVal = emp.taxCategory === 'otsu' ? '乙' : '甲';
+        if (row.key === "_employeeType") defaultVal = emp.employeeType || '';
+        if (row.key === "_standardRemuneration") defaultVal = emp.standardRemuneration || 0;
+        
+        let storedVal = data[row.key];
+        let displayVal = storedVal !== undefined && storedVal !== "" ? storedVal : defaultVal;
+        
+        let formattedVal = displayVal;
+        if (row.key === "_standardRemuneration" && !isNaN(displayVal)) {
+          formattedVal = Number(displayVal).toLocaleString();
+        }
+        
+        html += `<td class="number-cell"><input type="text" data-emp="${emp.id}" data-month="${m}" data-key="${row.key}" value="${formattedVal}" class="ledger-input text-center text-slate-500" placeholder="自動" /></td>`;
       } else {
         val = data[row.key] || "";
         rowTotal += PayrollCalculator.parseNum(val);
@@ -133,7 +153,11 @@ export async function renderLedger(employeeId) {
     });
 
     // Row total column
-    html += `<td class="number-cell bg-slate-50 font-bold">${rowTotal.toLocaleString()}</td>`;
+    if (row.type === "setting") {
+      html += `<td class="number-cell bg-slate-50 font-bold text-center text-slate-400">-</td>`;
+    } else {
+      html += `<td class="number-cell bg-slate-50 font-bold">${rowTotal.toLocaleString()}</td>`;
+    }
     html += `</tr>`;
   });
 

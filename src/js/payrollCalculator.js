@@ -38,8 +38,18 @@ export class PayrollCalculator {
     employmentInsurance = row.employmentInsurance !== undefined && row.employmentInsurance !== "" ? 
                           this.parseNum(row.employmentInsurance) : employmentInsurance;
 
+    // Settings overrides from ledger (per month)
+    const stdRemunStr = row._standardRemuneration;
+    const standardRemuneration = stdRemunStr !== undefined && stdRemunStr !== "" ? this.parseNum(stdRemunStr) : (this.parseNum(employee.standardRemuneration) || 0);
+
+    const dependentsStr = row._dependents;
+    const dependents = dependentsStr !== undefined && dependentsStr !== "" ? parseInt(dependentsStr, 10) : (employee.dependents || 0);
+
+    const taxCatStr = row._taxCategory;
+    const taxCategoryRaw = taxCatStr !== undefined && taxCatStr !== "" ? taxCatStr : (employee.taxCategory || 'kou');
+    const taxCategory = taxCategoryRaw === '乙' || taxCategoryRaw === 'otsu' ? 'otsu' : 'kou';
+
     // 健康保険 & 厚生年金 (Health & Pension): Based on standard remuneration (標準報酬月額)
-    const standardRemuneration = this.parseNum(employee.standardRemuneration) || 0;
     const healthInsurance = row.healthInsurance !== undefined && row.healthInsurance !== "" ? 
                             this.parseNum(row.healthInsurance) : Math.round(standardRemuneration * this.INSURANCE_RATES.health);
     const pensionInsurance = row.pensionInsurance !== undefined && row.pensionInsurance !== "" ? 
@@ -53,9 +63,9 @@ export class PayrollCalculator {
     const socialInsurances = healthInsurance + careInsurance + pensionInsurance + employmentInsurance;
     const taxableIncome = totalEarnings - nonTaxableCommute - socialInsurances;
     
-    // Simple mock calculation for Income Tax. In reality, requires complex tax table lookup.
+    // Calculate Income Tax using local overrides
     let incomeTax = row.incomeTax !== undefined && row.incomeTax !== "" ? 
-                    this.parseNum(row.incomeTax) : this.calculateIncomeTax(taxableIncome, employee.dependents, employee.taxCategory);
+                    this.parseNum(row.incomeTax) : this.calculateIncomeTax(taxableIncome, dependents, taxCategory);
 
     const residentTax = this.parseNum(row.residentTax);
     const yearEndAdjustment = this.parseNum(row.yearEndAdjustment);
