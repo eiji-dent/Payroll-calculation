@@ -197,6 +197,14 @@
                   <div><label class="block text-sm text-slate-500">区分</label><input type="text" id="emp-detail-type" class="form-input mt-1"></div>
                   <div><label class="block text-sm text-slate-500">雇入年月日</label><input type="date" id="emp-detail-hiredate" class="form-input mt-1"></div>
                   <div><label class="block text-sm text-slate-500">標準報酬月額</label><input type="number" id="emp-detail-remuneration" class="form-input mt-1"></div>
+                  <div><label class="block text-sm text-slate-500">扶養親族の数</label><input type="number" id="emp-detail-dependents" class="form-input mt-1" min="0" value="0"></div>
+                  <div>
+                    <label class="block text-sm text-slate-500">税額表区分</label>
+                    <select id="emp-detail-taxcategory" class="form-input mt-1 bg-white">
+                      <option value="kou">甲欄（メイン職場）</option>
+                      <option value="otsu">乙欄（サブ職場）</option>
+                    </select>
+                  </div>
                 </div>
               </div>
               

@@ -109,7 +109,9 @@ body {
   text-align: center;
 }
 .ledger-table input {
-  width: 60px;
+  width: 100%;
+  min-width: 60px;
+  box-sizing: border-box;
   border: none;
   background: transparent;
   text-align: right;

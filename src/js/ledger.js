@@ -37,8 +37,12 @@ export async function renderLedger(employeeId) {
 
   const wrapper = document.getElementById('ledger-wrapper');
   
-  // Dummy data for months (would come from DB in reality)
-  const months = ['1/15', '2/13', '3/13', '4/15', '5/15'];
+  // Get months from DB or use defaults
+  let months = emp.months;
+  if (!months) {
+    months = ['1/15', '2/13', '3/13', '4/15', '5/15'];
+    emp.months = months;
+  }
   
   // Initialize payroll data if empty
   if (!emp.payrolls) {
@@ -65,16 +69,28 @@ export async function renderLedger(employeeId) {
     <div class="p-4 bg-white hidden-print flex justify-between items-center border-b border-slate-200">
       <h3 class="text-lg font-bold text-slate-800">令和8年 賃金台帳</h3>
       <div class="text-sm text-slate-500">氏名: <span class="font-bold text-slate-800">${emp.name}</span> | 標準報酬月額: ${emp.standardRemuneration.toLocaleString()}円</div>
-      <button class="btn-primary" id="btn-share-line">
-        <i data-lucide="message-circle" class="inline w-4 h-4 mr-1"></i> LINEで明細を送る
-      </button>
+      <div class="flex items-center gap-2">
+        <button class="btn-outline text-sm" id="btn-add-month">
+          <i data-lucide="plus" class="inline w-4 h-4 mr-1"></i> 列を追加
+        </button>
+        <button class="btn-primary" id="btn-share-line">
+          <i data-lucide="message-circle" class="inline w-4 h-4 mr-1"></i> LINEで明細を送る
+        </button>
+      </div>
     </div>
     <div class="p-4" id="print-area">
       <table class="ledger-table w-full">
         <thead>
           <tr>
             <th colspan="2" rowspan="2">項目</th>
-            ${months.map(m => `<th>${m}</th>`).join('')}
+            ${months.map((m, idx) => `<th class="relative group min-w-[5rem]">
+              <div class="flex items-center justify-center gap-1">
+                <input type="text" value="${m}" data-idx="${idx}" class="month-header-input bg-transparent border-b border-dashed border-slate-300 text-center w-16 focus:outline-none focus:border-teal-500 font-bold hover:bg-slate-100 transition-colors cursor-text" placeholder="日付">
+                <button class="btn-delete-month text-slate-400 hover:text-red-500 text-lg leading-none p-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" data-idx="${idx}" title="列を削除">
+                  &times;
+                </button>
+              </div>
+            </th>`).join('')}
             <th>合計</th>
           </tr>
         </thead>
@@ -156,6 +172,54 @@ export async function renderLedger(employeeId) {
       await saveEmployee(emp);
       renderLedger(emp.id); // re-render entirely
     });
+  });
+
+  // Attach event listeners to month headers for renaming
+  const monthInputs = wrapper.querySelectorAll('.month-header-input');
+  monthInputs.forEach(input => {
+    input.addEventListener('change', async (e) => {
+      const idx = e.target.dataset.idx;
+      const newMonth = e.target.value.trim();
+      const oldMonth = emp.months[idx];
+      
+      if (newMonth && newMonth !== oldMonth) {
+        // Migrate data to new key
+        emp.payrolls[newMonth] = emp.payrolls[oldMonth] || {};
+        delete emp.payrolls[oldMonth];
+        emp.months[idx] = newMonth;
+        
+        await saveEmployee(emp);
+        renderLedger(emp.id);
+      } else {
+        // Revert if empty
+        e.target.value = oldMonth;
+      }
+    });
+  });
+
+  // Delete column feature
+  const deleteBtns = wrapper.querySelectorAll('.btn-delete-month');
+  deleteBtns.forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const idx = parseInt(e.currentTarget.dataset.idx, 10);
+      const monthToRemove = emp.months[idx];
+      if (confirm(`「${monthToRemove}」の列を削除してもよろしいですか？`)) {
+        emp.months.splice(idx, 1);
+        delete emp.payrolls[monthToRemove];
+        await saveEmployee(emp);
+        renderLedger(emp.id);
+      }
+    });
+  });
+
+  // Add new column feature
+  document.getElementById('btn-add-month')?.addEventListener('click', async () => {
+    const nextNum = emp.months.length + 1;
+    const newMonth = `${nextNum}月分`; // Default name
+    emp.months.push(newMonth);
+    emp.payrolls[newMonth] = {};
+    await saveEmployee(emp);
+    renderLedger(emp.id);
   });
 
   // LINE sharing feature

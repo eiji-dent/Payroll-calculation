@@ -15,6 +15,8 @@ export async function renderEmployeeDetails(empId, goBackCallback) {
   document.getElementById('emp-detail-type').value = emp.employeeType || '';
   document.getElementById('emp-detail-hiredate').value = emp.hireDate || '';
   document.getElementById('emp-detail-remuneration').value = emp.standardRemuneration || '';
+  document.getElementById('emp-detail-dependents').value = emp.dependents || 0;
+  document.getElementById('emp-detail-taxcategory').value = emp.taxCategory || 'kou';
 
   // Set commute & memo
   document.getElementById('emp-detail-route').value = emp.commuteRoute || '';
@@ -39,6 +41,8 @@ export async function renderEmployeeDetails(empId, goBackCallback) {
     emp.employeeType = document.getElementById('emp-detail-type').value;
     emp.hireDate = document.getElementById('emp-detail-hiredate').value;
     emp.standardRemuneration = parseInt(document.getElementById('emp-detail-remuneration').value, 10) || 0;
+    emp.dependents = parseInt(document.getElementById('emp-detail-dependents').value, 10) || 0;
+    emp.taxCategory = document.getElementById('emp-detail-taxcategory').value || 'kou';
     
     emp.commuteRoute = document.getElementById('emp-detail-route').value;
     emp.commuteFare = parseInt(document.getElementById('emp-detail-fare').value, 10) || 0;
