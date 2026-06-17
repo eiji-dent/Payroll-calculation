@@ -1,0 +1,56 @@
+@media print {
+  /* Hide all UI elements not meant for printing */
+  .hidden-print, aside, header {
+    display: none !important;
+  }
+  
+  /* Reset background and text colors */
+  body {
+    background-color: white !important;
+    color: black !important;
+  }
+  
+  /* Adjust main container to fill page */
+  main {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+  
+  .view-container {
+    display: none;
+  }
+  
+  /* Show only the active print area */
+  #view-payroll-ledger {
+    display: block !important;
+  }
+
+  .print-wrapper {
+    border: none !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    width: 100% !important;
+  }
+  
+  /* Fix Ledger Table borders and scaling */
+  .ledger-table {
+    border: 2px solid black;
+    width: 100%;
+    page-break-inside: avoid;
+  }
+  .ledger-table th, .ledger-table td {
+    border: 1px solid black;
+    padding: 2px 4px;
+    font-size: 8pt;
+  }
+  .ledger-table input {
+    color: black;
+    font-size: 8pt;
+  }
+
+  @page {
+    size: A4 landscape;
+    margin: 10mm;
+  }
+}
