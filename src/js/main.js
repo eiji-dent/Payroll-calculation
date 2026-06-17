@@ -8,6 +8,19 @@ createIcons({ icons });
 
 document.addEventListener('DOMContentLoaded', async () => {
   
+  // Password Protection Logic
+  const APP_PASSWORD = "mejimari";
+  const passwordForm = document.getElementById('password-form');
+  passwordForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const input = document.getElementById('app-password').value;
+    if (input === APP_PASSWORD) {
+      document.getElementById('password-overlay').classList.add('hidden');
+    } else {
+      document.getElementById('password-error').classList.remove('hidden');
+    }
+  });
+
   // Folder Selection Logic
   document.getElementById('btn-select-folder').addEventListener('click', async () => {
     const success = await requestDirectoryAccess();

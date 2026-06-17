@@ -12,6 +12,23 @@
   </head>
   <body class="bg-slate-50 text-slate-900 font-sans antialiased min-h-screen flex">
     
+    <!-- Password Protection Overlay -->
+    <div id="password-overlay" class="fixed inset-0 bg-teal-900 z-[100] flex flex-col items-center justify-center backdrop-blur-md">
+      <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center transform transition-all">
+        <div class="bg-teal-100 text-teal-700 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="lock" class="w-8 h-8"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-800 mb-2">ログイン</h2>
+        <p class="text-slate-500 mb-6 text-sm">パスワードを入力してください</p>
+        <form id="password-form" class="space-y-4">
+          <input type="password" id="app-password" class="form-input w-full text-center text-lg tracking-widest" placeholder="••••••••" required>
+          <p id="password-error" class="text-red-500 text-sm hidden">パスワードが間違っています</p>
+          <button type="submit" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg w-full transition-colors">
+            ロック解除
+          </button>
+        </form>
+      </div>
+    </div>
     <!-- Folder Selection Overlay -->
     <div id="folder-selection-overlay" class="fixed inset-0 bg-slate-900/80 z-50 flex items-center justify-center backdrop-blur-sm">
       <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full text-center">
